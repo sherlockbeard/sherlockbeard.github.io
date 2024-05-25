@@ -15,6 +15,11 @@ module ExternalPosts
           return if xml.nil?
           feed = Feedjira.parse(xml)
           feed.entries.each do |e|
+            if src['for_author'] != nil
+              if e.author != src['for_author']
+                next
+              end
+            end
             p "...fetching #{e.url}"
             slug = e.title.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')
             path = site.in_source_dir("_posts/#{slug}.md")
