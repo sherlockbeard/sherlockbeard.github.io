@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://siddharth-gulia.github.io/sitemap.xml
+Sitemap: https://sherlockbeard.github.io/sitemap.xml
