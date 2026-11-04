@@ -1,0 +1,62 @@
+---
+layout: post
+title: Databricks Genie Code re-sent my queued message for hours
+date: 2026-11-04
+description: Genie Code kept sending the same queued message 100+ times, and why that should worry anyone using AI agents.
+tags: databricks genie-code ai
+categories: databricks
+---
+
+**TL;DR:** Between 6 and 7 October 2026, Genie Code kept on re-sending the same queued message for hours, 100+ times, and Genie replied to every one. Databricks confirmed the issue and reverted the change, but I haven't seen any public notice, and from what I can tell you only get the charges back if you notice it and raise a ticket. Queued messages also run with your access, so a loop like this could do a lot more damage than a big bill.
+
+## What happened
+
+If you haven't used it, [Genie Code](https://docs.databricks.com/aws/en/genie-code/) is the AI coding assistant built into Databricks. You can type your next message while it's still working on the last one. That message sits in a queue and gets sent once Genie is done. Normally it works fine.
+
+On 6 and 7 October 2026 it didn't. The queued message got sent, Genie replied, and then the exact same message got sent again. It went on like this for hours. The same message went out 100+ times and Genie gave a full answer to every single one.
+
+It didn't happen every time, and I still don't know what triggered it. Databricks support confirmed it was a Genie Code issue, and after 7 October, they reverted the change.
+
+## Genie knew it was repeating
+
+One fun thing I noticed while reviewing the chat was that after around the 5th message, Genie started every reply with something like "As I have already answered multiple times, the answer is the same..." and then gave the same info again.
+
+So the AI knew it was getting the same question again and again. It just had no way to stop it, and nothing else in the product stopped it either. It was funny at first, but it's kind of scary when you think about it.
+
+## Was it a queue issue, and could it have been avoided?
+
+From what I saw, it looks like a problem with how queued messages are handled. A message that was already sent kept on getting sent again.
+
+I think it could have been avoided pretty easily. Just not sending the same queued message twice, or stopping to ask me after it repeated a couple of times, would have done it. Even a simple limit on how many times Genie can run without the user doing anything would have ended this after a few repeats instead of 100+.
+
+## It runs with your access
+
+Every repeated message showed up as sent by me. Genie Code runs as the user, with the user's access, and in agent mode it can run code, query tables and change notebooks.
+
+Now think what would happen if the queued message was something like "drop the staging table and reload it." It would basically keep running that again and again under your name until someone noticed, and in the logs it would look like you did it. Some actions might ask for approval first, but if you're in auto-approve mode it won't ask at all, so everything would just keep running.
+
+Also, people don't sit and watch agents work. You ask Genie to do something and move to another tab while it works. Or it's your last message of the day and you close the laptop. If the loop starts at that point, nobody is watching it, and you might only find out much later.
+
+And even when the message is harmless, every repeat is a full Genie run that you pay for.
+
+## What I don't like about how Databricks handled it
+
+Bugs happen, I get that. It's what happened after that annoyed me.
+
+They reverted the change, so they clearly knew something was wrong. A loop like this should also be easy to spot in their own data, since it's the same message in the same conversation 100+ times. So they can probably find every workspace that got hit. But I haven't seen any public notice, and from what I can tell the charges only get reversed if you notice it yourself and open a support ticket, so if you don't notice, you just pay.
+
+To me that's the wrong way round. Databricks has fixed billing on its own before. In July 2026 they added correction records to the billing system table that cancelled Genie One and Genie Agents charges, without anyone having to ask ([release notes](https://docs.databricks.com/aws/en/ai-bi/release-notes/2026#genie-one-and-genie-agents-billed-usage-corrections)). They should do the same here and reverse the charges for everyone who got hit, without waiting for tickets. An explanation of what went wrong would be nice too.
+
+Also, support on this was slow and honestly pretty frustrating. For a bug they already confirmed, it shouldn't be this hard to get help.
+
+## If you use Genie Code
+
+- Set up a Genie budget with a per-user limit. Account admins can set budgets for the whole account, a workspace, a group or a single user, and get an alert or block usage when the limit is hit ([docs](https://docs.databricks.com/aws/en/genie/budgets)). Don't treat it as a hard cap, though. Databricks' own docs say blocking is only approximate and requests that are already running don't get stopped.
+- Check your billing system table every now and then for weird spikes in Genie Code usage.
+- If this already happened to you, open a support ticket and ask for the charges to be reversed.
+
+---
+
+*This post is about my own experience and opinions. It's not related to my employer and doesn't represent them.*
+
+*Claude was used for consolidating, proofreading and grammar correction.*
