@@ -57,6 +57,6 @@ Also, support on this was slow and honestly pretty frustrating. For a bug they a
 
 ---
 
-*This post is about my own experience and opinions. It's not related to my employer and doesn't represent them.*
+_This post is about my own experience and opinions. It's not related to my employer and doesn't represent them._
 
-*Claude was used for consolidating, proofreading and grammar correction.*
+_Claude was used for consolidating, proofreading and grammar correction._
